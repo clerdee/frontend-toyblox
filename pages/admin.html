@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - ToyBlox</title>
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/datatables.min.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Product Management</h1>
+        
+        <!-- Add Product Button -->
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#productModal">
+            Add New Product
+        </button>
+        
+        <!-- Products DataTable -->
+        <table id="productsTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be loaded via AJAX -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Product Modal for Add/Edit -->
+    <div class="modal fade" id="productModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add/Edit Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="productId">
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="productName" required>
+                        </div>
+                        <!-- Add more form fields -->
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProduct()">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/jquery.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/datatables.min.js"></script>
+    <script>
+        // Initialize DataTable
+        $(document).ready(function() {
+            $('#productsTable').DataTable({
+                ajax: {
+                    url: 'http://localhost:3000/api/products',
+                    dataSrc: ''
+                },
+                columns: [
+                    { data: 'id' },
+                    { data: 'name' },
+                    { data: 'price' },
+                    { data: 'category' },
+                    { data: 'in_stock' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return `
+                                <button class="btn btn-sm btn-warning" onclick="editProduct(${row.id})">Edit</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProduct(${row.id})">Delete</button>
+                            `;
+                        }
+                    }
+                ]
+            });
+        });
+    </script>
+</body>
+</html>
