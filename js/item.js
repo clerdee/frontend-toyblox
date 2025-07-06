@@ -1,9 +1,9 @@
 $(document).ready(function () {
-    const url = 'http://localhost:4000/';
+    const baseUrl = 'http://localhost:4000/';
 
     const table = $('#itemTable').DataTable({
         ajax: {
-            url: `${url}api/v1/items`,
+            url: `${baseUrl}api/v1/items`,
             dataSrc: "rows"
         },
         dom: 'Bfrtip',
@@ -28,7 +28,7 @@ $(document).ready(function () {
             {
                 data: 'image',
                 render: function (data) {
-                    return `<img src="${url}${data}" width="50" height="60">`;
+                    return `<img src="${baseUrl}${data}" width="50" height="60">`;
                 }
             },
             { data: 'description' },
