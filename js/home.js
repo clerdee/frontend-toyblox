@@ -1,4 +1,4 @@
-        // User Modal Functionality
+// User Modal Functionality
         const userIcon = document.getElementById('userIcon');
         const userModal = document.getElementById('userModal');
         const closeModal = document.getElementById('closeModal');
@@ -140,4 +140,75 @@
                     });
                 }
             });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+          // Show user name and logout if logged in
+          const user = JSON.parse(localStorage.getItem('user'));
+          const userNameDisplay = document.getElementById('userNameDisplay');
+          const logoutBtn = document.getElementById('logoutBtn');
+          const userIcon = document.getElementById('userIcon');
+          const profileModal = document.getElementById('profileModal');
+          const closeProfileModal = document.getElementById('closeProfileModal');
+
+          if (user && user.f_name) {
+            userNameDisplay.textContent = user.f_name;
+            userNameDisplay.style.display = 'inline';
+            logoutBtn.style.display = 'inline-block';
+            userIcon.style.cursor = 'pointer';
+            userIcon.onclick = function() {
+              showProfileModal(user);
+            };
+          } else {
+            userNameDisplay.style.display = 'none';
+            logoutBtn.style.display = 'none';
+            userIcon.style.cursor = 'default';
+            userIcon.onclick = null;
+          }
+
+          logoutBtn && logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('user');
+            window.location.reload();
+          });
+
+          // Login form logic
+          const loginForm = document.querySelector('#loginForm form');
+          if (loginForm) {
+            loginForm.addEventListener('submit', async function(e) {
+              e.preventDefault();
+              const email = document.getElementById('loginEmail').value;
+              const password = document.getElementById('loginPassword').value;
+              try {
+                const response = await fetch('http://localhost:4000/api/v1/users/login', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email, password })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                  showNotification('Login successful!');
+                  localStorage.setItem('user', JSON.stringify(result.user || { f_name: result.f_name, l_name: result.l_name, email: result.email }));
+                  setTimeout(() => { window.location.reload(); }, 1200);
+                } else {
+                  showNotification(result.error || 'Login failed!', true);
+                }
+              } catch (error) {
+                showNotification('Network error: ' + error.message, true);
+              }
+            });
+          }
+
+          // Update user icon click to go to profile.html if logged in
+          if (user && user.f_name) {
+            userIcon.style.cursor = 'pointer';
+            userIcon.onclick = function() {
+              window.location.href = 'profile.html';
+            };
+          } else {
+            userIcon.style.cursor = 'default';
+            userIcon.onclick = function() {
+              userModal.style.display = 'block';
+              document.body.style.overflow = 'hidden';
+            };
+          }
         });
