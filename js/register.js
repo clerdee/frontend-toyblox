@@ -13,15 +13,12 @@ document.getElementById('register-form').addEventListener('submit', async functi
     const result = await response.json();
 
     if (response.ok) {
-      // Show custom notification
       showNotification('Registration successful! Logging you in...');
-      // Store user info in localStorage (simulate login)
-      localStorage.setItem('user', JSON.stringify(result.user || { f_name: formData.get('f_name') }));
+      localStorage.setItem('user', JSON.stringify(result.user || { f_name: formData.get('f_name'), l_name: formData.get('l_name'), email: formData.get('email') }));
       setTimeout(() => {
         window.location.reload();
       }, 1500);
       form.reset();
-      // Optionally closeModal();
     } else {
       showNotification(result.error || 'Registration failed!', true);
     }

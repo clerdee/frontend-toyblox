@@ -18,7 +18,7 @@
                     <li><a href="#home" class="nav-link">Home</a></li>
                     <li><a href="#categories" class="nav-link">Toys</a></li>
                     <li><a href="#featured" class="nav-link">Featured</a></li>
-                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li id="profileMenuItem" style="display:none;"><a href="profile.html" class="nav-link">Profile</a></li>
                 </ul>
                 <div class="nav-icons">
                     <div class="user-icon" id="userIcon">
@@ -198,7 +198,7 @@
                     <p>Enter your kingdom credentials</p>
                 </div>
                 
-                <form class="auth-form-container">
+                <form id="login-form" class="auth-form-container">
                     <div class="input-group">
                         <label for="loginEmail">Email</label>
                         <input type="email" id="loginEmail" placeholder="Enter your email" required>
@@ -226,18 +226,7 @@
                 <div class="auth-divider">
                     <span>or</span>
                 </div>
-                
-                <!-- <div class="social-login">
-                    <button class="btn btn-social google">
-                        <span class="social-icon">🔍</span>
-                        Continue with Google
-                    </button>
-                    <button class="btn btn-social facebook">
-                        <span class="social-icon">📘</span>
-                        Continue with Facebook
-                    </button>
-                </div> -->
-                
+                 
                 <div class="auth-switch">
                     <p>New to Toy Kingdom? <a href="#" id="showRegister">Create an account</a></p>
                 </div>
@@ -294,17 +283,6 @@
                     <span>or</span>
                 </div>
                 
-                <!-- <div class="social-login">
-                    <button class="btn btn-social google">
-                        <span class="social-icon">🔍</span>
-                        Sign up with Google
-                    </button>
-                    <button class="btn btn-social facebook">
-                        <span class="social-icon">📘</span>
-                        Sign up with Facebook
-                    </button>
-                </div> -->
-                
                 <div class="auth-switch">
                     <p>Already have an account? <a href="#" id="showLogin">Sign in here</a></p>
                 </div>
@@ -312,20 +290,9 @@
         </div>
     </div>
 
-    <!-- Profile Modal -->
-    <div id="profileModal" class="modal">
-      <div class="modal-content" style="max-width:400px;">
-        <span class="close" id="closeProfileModal">&times;</span>
-        <h2>Account Information</h2>
-        <img id="profilePic" src="" alt="Profile Picture" style="width:80px;height:80px;border-radius:50%;display:none;margin-bottom:10px;">
-        <p><strong>Name:</strong> <span id="profileName"></span></p>
-        <p><strong>Email:</strong> <span id="profileEmail"></span></p>
-      </div>
-    </div>
-
 <script src="js/home.js"></script>
 <script src="js/register.js"></script>
-<script src="js/login.js"></script>
+<!-- <script src="js/login.js"></script> -->
 
 </body>
 </html>

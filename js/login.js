@@ -1,57 +1,48 @@
-async function login(email, password) {
-    try {
-        const response = await fetch('YOUR_API_ENDPOINT/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email, password })
-        });
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
 
-        const data = await response.json();
+  const form = e.target;
+  const formData = new FormData(form);
+  const email = formData.get('email');
+  const password = formData.get('password');
 
-        if (response.ok) {
-            // Store user data in localStorage
-            localStorage.setItem('user', JSON.stringify(data.user));
-            
-            // Update UI elements
-            const userIcon = document.querySelector('.user-icon');
-            userIcon.innerHTML = `<img src="assets/user-logged-in.png" alt="Profile">`;
-            userIcon.href = 'profile.html';
-            
-            // Show success message (using a toast or custom notification)
-            showNotification('Login successful!', 'success');
-            
-            // Redirect to previous page or home
-            window.location.href = document.referrer || 'index.html';
+  try {
+    const response = await fetch('http://localhost:4000/api/v1/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      showNotification('Login successful! Redirecting...');
+      localStorage.setItem('user', JSON.stringify(result.user));
+      localStorage.setItem('token', result.token); // If your backend returns a token
+      setTimeout(() => {
+        // Redirect based on role
+        if (result.user.role === 'admin') {
+          window.location.href = 'admin/admin.html';
         } else {
-            showNotification(data.message || 'Login failed', 'error');
+          window.location.href = 'home.html';
         }
-    } catch (error) {
-        showNotification('An error occurred. Please try again.', 'error');
+      }, 1500);
+    } else {
+      showNotification(result.error || 'Invalid credentials!', true);
     }
-}
-
-// Add this notification function
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('fade-out');
-        setTimeout(() => notification.remove(), 500);
-    }, 3000);
-}
-
-// Add this to check login status on page load
-document.addEventListener('DOMContentLoaded', () => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (user) {
-        const userIcon = document.querySelector('.user-icon');
-        userIcon.innerHTML = `<img src="assets/user-logged-in.png" alt="Profile">`;
-        userIcon.href = 'profile.html';
-    }
+  } catch (error) {
+    showNotification('Network error: ' + error.message, true);
+  }
 });
+
+function showNotification(message, isError = false) {
+  let notif = document.createElement('div');
+  notif.className = 'custom-notification' + (isError ? ' error' : '');
+  notif.textContent = message;
+  document.body.appendChild(notif);
+  setTimeout(() => {
+    notif.remove();
+  }, 2000);
+}

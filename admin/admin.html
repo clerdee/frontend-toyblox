@@ -1,0 +1,299 @@
+<script>
+    const user = JSON.parse(localStorage.getItem('user'));
+if (!user || user.role !== 'admin') {
+  window.location.href = '../home.html';
+}
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToyBlox Admin - Kingdom Management</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Admin Header -->
+    <header class="admin-header">
+        <div class="admin-nav">
+            <div class="logo">
+                <h1>🏰 ToyBlox Admin</h1>
+            </div>
+            <div class="admin-actions">
+                <div class="notification-icon">
+                    <span class="notification-count">3</span>
+                    🔔
+                </div>
+                <div class="admin-profile">
+                    <img src="https://via.placeholder.com/40x40" alt="Admin" class="profile-img">
+                    <span class="admin-name">Admin</span>
+                    <div class="dropdown-arrow">▼</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h3>Dashboard</h3>
+                    <ul>
+                        <li><a href="#dashboard" class="nav-link active">📊 Overview</a></li>
+                        <li><a href="#analytics" class="nav-link">📈 Analytics</a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Products</h3>
+                    <ul>
+                        <li><a href="#products" class="nav-link">🧸 All Products</a></li>
+                        <li><a href="#add-product" class="nav-link">➕ Add Product</a></li>
+                        <li><a href="#categories" class="nav-link">🏷️ Categories</a></li>
+                        <li><a href="#inventory" class="nav-link">📦 Inventory</a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Orders</h3>
+                    <ul>
+                        <li><a href="#orders" class="nav-link">📋 All Orders</a></li>
+                        <li><a href="#pending" class="nav-link">⏳ Pending</a></li>
+                        <li><a href="#shipped" class="nav-link">🚚 Shipped</a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Users</h3>
+                    <ul>
+                        <li><a href="#customers" class="nav-link">👥 Customers</a></li>
+                        <li><a href="#admins" class="nav-link">👑 Admins</a></li>
+                    </ul>
+                </div>
+                
+                <div class="nav-section">
+                    <h3>Settings</h3>
+                    <ul>
+                        <li><a href="#settings" class="nav-link">⚙️ General</a></li>
+                        <li><a href="#reports" class="nav-link">📊 Reports</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Overview -->
+            <section id="dashboard" class="content-section active">
+                <div class="section-header">
+                    <h2>Kingdom Overview</h2>
+                    <div class="header-actions">
+                        <select class="date-filter">
+                            <option>Last 7 days</option>
+                            <option>Last 30 days</option>
+                            <option>Last 90 days</option>
+                        </select>
+                        <button class="btn btn-primary">Export Report</button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <h3>Total Revenue</h3>
+                            <p class="stat-value">$24,567</p>
+                            <span class="stat-change positive">+12.5%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📦</div>
+                        <div class="stat-info">
+                            <h3>Total Orders</h3>
+                            <p class="stat-value">1,234</p>
+                            <span class="stat-change positive">+8.2%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🧸</div>
+                        <div class="stat-info">
+                            <h3>Products</h3>
+                            <p class="stat-value">567</p>
+                            <span class="stat-change neutral">+2.1%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-info">
+                            <h3>Customers</h3>
+                            <p class="stat-value">8,901</p>
+                            <span class="stat-change positive">+15.3%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent Orders</h3>
+                            <a href="#orders" class="view-all">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <div class="order-item">
+                                <div class="order-info">
+                                    <span class="order-id">#12345</span>
+                                    <span class="customer-name">John Doe</span>
+                                </div>
+                                <div class="order-details">
+                                    <span class="order-amount">$89.99</span>
+                                    <span class="order-status pending">Pending</span>
+                                </div>
+                            </div>
+                            <div class="order-item">
+                                <div class="order-info">
+                                    <span class="order-id">#12344</span>
+                                    <span class="customer-name">Jane Smith</span>
+                                </div>
+                                <div class="order-details">
+                                    <span class="order-amount">$45.99</span>
+                                    <span class="order-status shipped">Shipped</span>
+                                </div>
+                            </div>
+                            <div class="order-item">
+                                <div class="order-info">
+                                    <span class="order-id">#12343</span>
+                                    <span class="customer-name">Bob Johnson</span>
+                                </div>
+                                <div class="order-details">
+                                    <span class="order-amount">$129.99</span>
+                                    <span class="order-status delivered">Delivered</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Top Products</h3>
+                            <a href="#products" class="view-all">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <div class="product-item">
+                                <div class="product-icon">🦄</div>
+                                <div class="product-info">
+                                    <span class="product-name">Magical Unicorn</span>
+                                    <span class="product-sales">152 sold</span>
+                                </div>
+                                <span class="product-revenue">$4,568</span>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-icon">🚀</div>
+                                <div class="product-info">
+                                    <span class="product-name">Space Explorer Set</span>
+                                    <span class="product-sales">98 sold</span>
+                                </div>
+                                <span class="product-revenue">$4,502</span>
+                            </div>
+                            <div class="product-item">
+                                <div class="product-icon">🏰</div>
+                                <div class="product-info">
+                                    <span class="product-name">Princess Castle</span>
+                                    <span class="product-sales">76 sold</span>
+                                </div>
+                                <span class="product-revenue">$6,839</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Management -->
+            <section id="products" class="content-section">
+                <div id="productManagementContainer"></div>
+            </section>
+
+            <!-- Add Product Form -->
+            <section id="add-product" class="content-section">
+                <div class="section-header">
+                    <h2>Add New Product</h2>
+                </div>
+
+                <div class="form-container">
+                    <form class="product-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="productName">Product Name</label>
+                                <input type="text" id="productName" placeholder="Enter product name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="productCategory">Category</label>
+                                <select id="productCategory" required>
+                                    <option value="">Select category</option>
+                                    <option value="plush">Plush & Cuddles</option>
+                                    <option value="vehicles">Vehicles & Racing</option>
+                                    <option value="games">Games & Puzzles</option>
+                                    <option value="arts">Arts & Crafts</option>
+                                    <option value="roleplay">Dress Up & Role Play</option>
+                                    <option value="building">Building & Construction</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="productPrice">Price</label>
+                                <input type="number" id="productPrice" placeholder="0.00" step="0.01" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="productStock">Stock Quantity</label>
+                                <input type="number" id="productStock" placeholder="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="productDescription">Description</label>
+                            <textarea id="productDescription" placeholder="Enter product description" rows="4"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="productImages">Product Images</label>
+                            <div class="file-upload">
+                                <input type="file" id="productImages" multiple accept="image/*">
+                                <div class="upload-area">
+                                    <div class="upload-icon">📷</div>
+                                    <p>Drop images here or click to browse</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Product</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../js/item.js"></script>
+    <script src="../js/admin-partials.js"></script>
+
+</body>
+</html>
