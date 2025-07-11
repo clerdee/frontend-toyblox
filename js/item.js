@@ -41,17 +41,17 @@ $(document).ready(function () {
             <td>${row.cost_price}</td>
             <td>${row.sell_price}</td>
             <td>${row.quantity}</td>
-                <td>
+            <td>
                 <a href="#" class="editBtn me-2" data-id="${row.item_id}" style="cursor:pointer;">
                     <i class="fas fa-edit" style="font-size:24px; pointer-events: auto;"></i>
                 </a>
                 <a href="#" class="deleteBtn" data-id="${row.item_id}" style="cursor:pointer;">
                     <i class="fas fa-trash-alt" style="font-size:24px; color:red; pointer-events: auto;"></i>
                 </a>
-                </td>
+            </td>
         </tr>
     `);
-}
+    }
 
     // Infinite scroll setup
     function setupInfiniteScroll(dataSet) {
@@ -93,73 +93,73 @@ $(document).ready(function () {
         $('#sell_price').val(item.sell_price);
         $('#quantity').val(item.quantity);
 
-    // Show current image previews (multiple)
-    if (Array.isArray(item.images) && item.images.length > 0) {
-        const previews = item.images.map(img =>
-            `<img src="${baseUrl}${img}" width="80" class="me-2 mb-2 rounded border">`
-        ).join('');
+        // Show current image previews (multiple)
+        if (Array.isArray(item.images) && item.images.length > 0) {
+            const previews = item.images.map(img =>
+                `<img src="${baseUrl}${img}" width="80" class="me-2 mb-2 rounded border">`
+            ).join('');
 
-        $('#currentImagePreview')
-            .html(previews)
-            .show();
-    } else {
-        $('#currentImagePreview').hide();
-    }
+            $('#currentImagePreview')
+                .html(previews)
+                .show();
+        } else {
+            $('#currentImagePreview').hide();
+        }
         $('#itemModal').modal('show');
     });
 
     // Submit form (edit)
     $('#itemForm').on('submit', function (e) {
-    e.preventDefault();
-    const id = $('#itemId').val();
+        e.preventDefault();
+        const id = $('#itemId').val();
 
-    const form = document.getElementById('itemForm');
-    const formData = new FormData(form);
+        const form = document.getElementById('itemForm');
+        const formData = new FormData(form);
 
-    $.ajax({
-        url: `${baseUrl}api/v1/items/${id}`,
-        method: 'PUT',
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function () {
-            showToast('Item updated successfully.', 'success');
-            $('#itemModal').modal('hide');
-            reloadTable();
-        },
-        error: function () {
-            showToast('Error updating item.', 'danger');
-        }
+        $.ajax({
+            url: `${baseUrl}api/v1/items/${id}`,
+            method: 'PUT',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function () {
+                showToast('Item updated successfully.', 'success');
+                $('#itemModal').modal('hide');
+                reloadTable();
+            },
+            error: function () {
+                showToast('Error updating item.', 'danger');
+            }
+        });
     });
+
+    // delete functionality
+    let deleteId = null;
+
+    $(document).on('click', '.deleteBtn', function (e) {
+        e.preventDefault();
+        deleteId = $(this).data('id');
+        $('#deleteItemId').val(deleteId);
+        $('#confirmDeleteModal').modal('show');
     });
 
-// delete functionality
-let deleteId = null;
+    $('#confirmDeleteBtn').on('click', function () {
+        const id = $('#deleteItemId').val();
 
-$(document).on('click', '.deleteBtn', function (e) {
-    e.preventDefault();
-    deleteId = $(this).data('id');
-    $('#deleteItemId').val(deleteId);
-    $('#confirmDeleteModal').modal('show');
-});
-
-$('#confirmDeleteBtn').on('click', function () {
-    const id = $('#deleteItemId').val();
-
-    $.ajax({
-        url: `${baseUrl}api/v1/items/${id}`,
-        method: 'DELETE',
-        success: function () {
-            $('#confirmDeleteModal').modal('hide');
-            showToast('Item deleted successfully.', 'success');
-            reloadTable();
-        },
-        error: function () {
-            $('#confirmDeleteModal').modal('hide');
-            showToast('Failed to delete item.', 'danger');
-        }
+        $.ajax({
+            url: `${baseUrl}api/v1/items/${id}`,
+            method: 'DELETE',
+            success: function () {
+                $('#confirmDeleteModal').modal('hide');
+                showToast('Item deleted successfully.', 'success');
+                reloadTable();
+            },
+            error: function () {
+                $('#confirmDeleteModal').modal('hide');
+                showToast('Failed to delete item.', 'danger');
+            }
+        });
     });
-});
 
     // Show toast notification
     function showToast(message, type = 'success') {
@@ -186,4 +186,28 @@ $('#confirmDeleteBtn').on('click', function () {
             setupInfiniteScroll(allData);
         });
     }
+
+    // Submit New Item
+    $('#addItemForm').on('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+
+        $.ajax({
+            url: `${baseUrl}api/v1/items`,
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function () {
+                showToast('Product added successfully!', 'success');
+                $('#addItemModal').modal('hide');
+                $('#addItemForm')[0].reset();
+                reloadTable();
+            },
+            error: function () {
+                showToast('Failed to add product.', 'danger');
+            }
+        });
+    });
 });

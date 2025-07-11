@@ -1014,3 +1014,27 @@ body {
         position: relative;
         vertical-align: middle;
     }
+
+    .profile-dropdown {
+  min-width: 150px;
+  background-color: white;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  border-radius: 5px;
+  overflow: hidden;
+  display: none;
+}
+
+.profile-dropdown button {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.profile-dropdown button:hover {
+  background-color: #f0f0f0;
+}

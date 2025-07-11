@@ -1,10 +1,3 @@
-<script>
-  const user = JSON.parse(localStorage.getItem('user'));
-if (!user) {
-  window.location.href = 'home.html'; 
-}
-</script>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,6 +8,13 @@ if (!user) {
 </head>
 <body>
 
+  <script>
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.id || user.role !== 'user') {
+    window.location.href = 'home.html';
+  }
+  </script>
+
   <header class="profile-header-bar">
     <a href="home.html" class="logo-link">🏰 ToyBlox</a>
   </header>
@@ -23,7 +23,7 @@ if (!user) {
     <h2 class="profile-title">👤 My Profile</h2>
 
     <div class="profile-pic">
-      <img src="images/default-avatar.png" alt="Profile Picture" id="profileImage">
+      <img src="images/default.jpg" alt="Profile Picture" id="profileImage">
       <input type="file" accept="image/*" onchange="loadProfileImage(event)">
     </div>
 
@@ -88,5 +88,10 @@ if (!user) {
       };
     }
   </script>
+
+  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+  <script src="/js/profile.js"></script>
+
 </body>
 </html>
