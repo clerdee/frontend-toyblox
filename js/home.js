@@ -84,30 +84,47 @@ loginForm.querySelector('form').addEventListener('submit', async function(e) {
 });
 
 // Handle register form submission
-registerForm.querySelector('form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const agreeTerms = document.getElementById('agreeTerms').checked;
-    
-    // Simple validation
-    if (password !== confirmPassword) {
-        alert('Passwords do not match!');
-        return;
+registerForm.querySelector('form').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const firstName = document.getElementById('firstName').value;
+  const lastName = document.getElementById('lastName').value;
+  const email = document.getElementById('registerEmail').value;
+  const password = document.getElementById('registerPassword').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
+  const profilePicture = document.getElementById('profilePicture').files[0];
+
+  if (password !== confirmPassword) {
+    return alert('Passwords do not match!');
+  }
+
+  const formData = new FormData();
+  formData.append('f_name', firstName);
+  formData.append('l_name', lastName);
+  formData.append('email', email);
+  formData.append('password', password);
+  if (profilePicture) {
+    formData.append('profile_picture', profilePicture);
+  }
+
+  try {
+    const response = await fetch('http://localhost:4000/api/v1/users', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      alert('✅ Registration successful! Please check your email to verify your account before logging in.');
+      userModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    } else {
+      alert(result.error || 'Registration failed.');
     }
-    
-    if (firstName && lastName && email && password) {
-        alert(`Welcome to Toy Kingdom, ${firstName}! 🎪`);
-        userModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        
-        // Update user icon to show logged in state
-        userIcon.innerHTML = '👑';
-        userIcon.title = 'Account Settings';
-    }
+  } catch (error) {
+    alert('Registration error: ' + error.message);
+  }
 });
 
 // Simple cart functionality
@@ -182,3 +199,56 @@ document.addEventListener('DOMContentLoaded', function() {
     window.location.reload();
   });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tokenFromUrl = urlParams.get('token');
+  const idFromUrl = urlParams.get('id');
+  const nameFromUrl = urlParams.get('name');
+
+  // 1️⃣ If user just verified via email and we got token/id/name
+  if (tokenFromUrl && idFromUrl && nameFromUrl) {
+    const user = {
+      id: idFromUrl,
+      f_name: decodeURIComponent(nameFromUrl),
+      role: 'user'
+    };
+    localStorage.setItem('token', tokenFromUrl);
+    localStorage.setItem('user', JSON.stringify(user));
+
+    // Remove query params from URL after saving
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userNameDisplay = document.getElementById('userNameDisplay');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userIcon = document.getElementById('userIcon');
+  const profileMenuItem = document.getElementById('profileMenuItem');
+
+  if (user && user.f_name) {
+    userNameDisplay.style.display = 'inline';
+    userNameDisplay.textContent = user.f_name;
+    userIcon.style.cursor = 'default';
+    userIcon.onclick = null;
+    logoutBtn.style.display = 'inline-block';
+    if (profileMenuItem) profileMenuItem.style.display = '';
+  } else {
+    userNameDisplay.style.display = 'none';
+    userIcon.innerHTML = '👤';
+    userIcon.style.cursor = 'pointer';
+    userIcon.onclick = function () {
+      userModal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    };
+    logoutBtn.style.display = 'none';
+    if (profileMenuItem) profileMenuItem.style.display = 'none';
+  }
+
+  logoutBtn && logoutBtn.addEventListener('click', function () {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.reload();
+  });
+});
+

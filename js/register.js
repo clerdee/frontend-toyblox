@@ -13,12 +13,14 @@ document.getElementById('register-form').addEventListener('submit', async functi
     const result = await response.json();
 
     if (response.ok) {
-      showNotification('Registration successful! Logging you in...');
-      localStorage.setItem('user', JSON.stringify(result.user || { f_name: formData.get('f_name'), l_name: formData.get('l_name'), email: formData.get('email') }));
-      setTimeout(() => {
-        window.location.reload();
-      }, 1500);
+      showNotification('✅ Registration successful! Please verify your email before logging in.');
       form.reset();
+
+      // Close modal and reset state
+      const userModal = document.getElementById('userModal');
+      userModal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+
     } else {
       showNotification(result.error || 'Registration failed!', true);
     }
