@@ -1,3 +1,91 @@
+document.addEventListener('DOMContentLoaded', function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const tokenFromUrl = urlParams.get('token');
+  const idFromUrl = urlParams.get('id');
+  const nameFromUrl = urlParams.get('name');
+
+  if (tokenFromUrl && idFromUrl && nameFromUrl) {
+    const user = {
+      id: Number(idFromUrl),
+      f_name: decodeURIComponent(nameFromUrl),
+      role: 'user'
+    };
+
+    localStorage.setItem('token', tokenFromUrl);
+    localStorage.setItem('user', JSON.stringify(user));
+
+    // ✅ Add your protected API call *after* localStorage is ready
+  setTimeout(() => {
+    fetchUserDetails(user.id);
+  }, 200); // delay can be adjusted if needed
+
+    // Remove query string from URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+
+  initPage();
+});
+
+async function fetchUserDetails(userId) {
+  const token = localStorage.getItem('token');
+  if (!token) return;
+
+  try {
+    const res = await fetch(`http://localhost:4000/api/v1/users/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      console.error('❌ Failed to fetch user:', err.error);
+      return;
+    }
+
+    const user = await res.json();
+    console.log('✅ User fetched after verification:', user);
+
+    // Optionally update localStorage again if more info is needed
+    // localStorage.setItem('user', JSON.stringify(user));
+  } catch (error) {
+    console.error('❌ Network error:', error);
+  }
+}
+
+function initPage() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const userNameDisplay = document.getElementById('userNameDisplay');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const userIcon = document.getElementById('userIcon');
+  const profileMenuItem = document.getElementById('profileMenuItem');
+
+  if (user && user.f_name) {
+    userNameDisplay.style.display = 'inline';
+    userNameDisplay.textContent = user.f_name;
+    userIcon.style.cursor = 'default';
+    userIcon.onclick = null;
+    logoutBtn.style.display = 'inline-block';
+    if (profileMenuItem) profileMenuItem.style.display = '';
+  } else {
+    userNameDisplay.style.display = 'none';
+    userIcon.innerHTML = '👤';
+    userIcon.style.cursor = 'pointer';
+    userIcon.onclick = function () {
+      userModal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    };
+    logoutBtn.style.display = 'none';
+    if (profileMenuItem) profileMenuItem.style.display = 'none';
+  }
+
+  logoutBtn && logoutBtn.addEventListener('click', function () {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    window.location.reload();
+  });
+}
+
 // User Modal Functionality
 const userIcon = document.getElementById('userIcon');
 const userModal = document.getElementById('userModal');
@@ -166,89 +254,3 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
-
-document.addEventListener('DOMContentLoaded', function() {
-  const user = JSON.parse(localStorage.getItem('user'));
-  const userNameDisplay = document.getElementById('userNameDisplay');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const userIcon = document.getElementById('userIcon');
-  const profileMenuItem = document.getElementById('profileMenuItem');
-
-  if (user && user.f_name) {
-    userNameDisplay.style.display = 'none';
-    userIcon.innerHTML = '👤 <span id="userNameDisplay" style="display:none;"></span>';
-    userIcon.style.cursor = 'default';
-    userIcon.onclick = null;
-    logoutBtn.style.display = 'inline-block';
-    if (profileMenuItem) profileMenuItem.style.display = '';
-  } else {
-    userNameDisplay.style.display = 'none';
-    userIcon.innerHTML = '👤 <span id="userNameDisplay" style="display:none;"></span>';
-    userIcon.style.cursor = 'pointer';
-    userIcon.onclick = function() {
-      const userModal = document.getElementById('userModal');
-      userModal.style.display = 'block';
-      document.body.style.overflow = 'hidden';
-    };
-    logoutBtn.style.display = 'none';
-    if (profileMenuItem) profileMenuItem.style.display = 'none';
-  }
-
-  logoutBtn && logoutBtn.addEventListener('click', function() {
-    localStorage.removeItem('user');
-    window.location.reload();
-  });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-  const urlParams = new URLSearchParams(window.location.search);
-  const tokenFromUrl = urlParams.get('token');
-  const idFromUrl = urlParams.get('id');
-  const nameFromUrl = urlParams.get('name');
-
-  // 1️⃣ If user just verified via email and we got token/id/name
-  if (tokenFromUrl && idFromUrl && nameFromUrl) {
-    const user = {
-      id: idFromUrl,
-      f_name: decodeURIComponent(nameFromUrl),
-      role: 'user'
-    };
-    localStorage.setItem('token', tokenFromUrl);
-    localStorage.setItem('user', JSON.stringify(user));
-
-    // Remove query params from URL after saving
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-
-  const user = JSON.parse(localStorage.getItem('user'));
-  const userNameDisplay = document.getElementById('userNameDisplay');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const userIcon = document.getElementById('userIcon');
-  const profileMenuItem = document.getElementById('profileMenuItem');
-
-  if (user && user.f_name) {
-    userNameDisplay.style.display = 'inline';
-    userNameDisplay.textContent = user.f_name;
-    userIcon.style.cursor = 'default';
-    userIcon.onclick = null;
-    logoutBtn.style.display = 'inline-block';
-    if (profileMenuItem) profileMenuItem.style.display = '';
-  } else {
-    userNameDisplay.style.display = 'none';
-    userIcon.innerHTML = '👤';
-    userIcon.style.cursor = 'pointer';
-    userIcon.onclick = function () {
-      userModal.style.display = 'block';
-      document.body.style.overflow = 'hidden';
-    };
-    logoutBtn.style.display = 'none';
-    if (profileMenuItem) profileMenuItem.style.display = 'none';
-  }
-
-  logoutBtn && logoutBtn.addEventListener('click', function () {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    window.location.reload();
-  });
-});
-

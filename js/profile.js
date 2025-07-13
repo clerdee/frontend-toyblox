@@ -10,21 +10,24 @@ $(document).ready(function () {
   const userId = user.id;
 
   $.ajax({
-    url: `${baseUrl}api/v1/users/${userId}`, // Should return JOINED data
+    url: `${baseUrl}api/v1/users/${userId}`,
     method: 'GET',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    },
     success: function (res) {
-      const data = res.data || res.rows || res;
+      const data = res.data;
 
-      $('#firstName').val(data.fname || data.f_name || '');
-      $('#lastName').val(data.lname || data.l_name || '');
-      $('#email').val(data.email || '');
+      $('#firstName').val(data.f_name);
+      $('#lastName').val(data.l_name);
+      $('#email').val(data.email);
       $('#address').val(data.address || '');
       $('#postalCode').val(data.postal_code || '');
       $('#country').val(data.country || '');
       $('#phone').val(data.phone_number || '');
 
       if (data.profile_picture) {
-        $('#profileImage').attr('src', `${baseUrl}${data.profile_picture}`);
+        $('#profileImage').attr('src', `${baseUrl}images/${data.profile_picture}`);
       }
     },
     error: function (xhr) {
