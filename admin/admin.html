@@ -1,3 +1,4 @@
+<!-- frontend/admin/admin.html -->
 <script>
     const user = JSON.parse(localStorage.getItem('user'));
 if (!user || user.role !== 'admin') {
@@ -58,7 +59,7 @@ if (!user || user.role !== 'admin') {
                         <li><a href="#products" class="nav-link">🧸 Products</a></li>
                         <li><a href="#inventory" class="nav-link">📦 Inventory</a></li>
                         <!-- <li><a href="#add-product" class="nav-link">➕ Add Product</a></li> -->
-                        <li><a href="#categories" class="nav-link">🏷️ Categories</a></li>
+                        <!-- <li><a href="#categories" class="nav-link">🏷️ Categories</a></li> -->
                     </ul>
                 </div>
                 
@@ -79,13 +80,13 @@ if (!user || user.role !== 'admin') {
                     </ul>
                 </div>
                 
-                <div class="nav-section">
+                <!-- <div class="nav-section">
                     <h3>Settings</h3>
                     <ul>
                         <li><a href="#settings" class="nav-link">⚙️ General</a></li>
                         <li><a href="#reports" class="nav-link">📊 Reports</a></li>
                     </ul>
-                </div>
+                </div> -->
             </nav>
         </aside>
 
@@ -230,6 +231,11 @@ if (!user || user.role !== 'admin') {
             <section id="inventory" class="content-section">
                 <div id="inventoryManagementContainer"></div>
             </section>
+
+            <!-- Customer Management -->
+            <section id="customers" class="content-section">
+                <div id="customerManagementContainer"></div>
+            </section>
         
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -240,6 +246,7 @@ if (!user || user.role !== 'admin') {
 
     <script src="../js/item.js"></script>
     <script src="../js/inventory.js"></script>
+    <script src="../js/user.js"></script>
     <script src="../js/admin-partials.js"></script>
 
     <script>

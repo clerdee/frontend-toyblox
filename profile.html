@@ -1,3 +1,4 @@
+<!-- profile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,28 +25,45 @@
 
     <div class="profile-pic">
       <img src="images/default.jpg" alt="Profile Picture" id="profileImage">
-      <input type="file" accept="image/*" onchange="loadProfileImage(event)">
+      <input type="file" id="profilePictureInput" accept="image/*" onchange="loadProfileImage(event)">
     </div>
 
     <form class="profile-form">
       <div>
-        <label for="firstName">First Name</label>
-        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name">
+        <label for="firstName">First Name *</label>
+        <input type="text" id="firstName" name="firstName" placeholder="Enter your first name" required>
       </div>
 
       <div>
-        <label for="lastName">Last Name</label>
-        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name">
+        <label for="lastName">Last Name *</label>
+        <input type="text" id="lastName" name="lastName" placeholder="Enter your last name" required>
       </div>
 
       <div class="full-width">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email">
+        <label for="email">Email *</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
       </div>
 
-      <div class="full-width">
-        <label for="password">Password</label>
-        <input type="password" id="password" value="***************" disabled>
+      <div class="full-width password-section">
+          <h3>Change Password (Optional)</h3>
+          <small style="color: #666; margin-bottom: 10px; display: block;">
+              Leave blank if you don't want to change your password
+          </small>
+          
+          <div style="margin-bottom: 15px;">
+              <label for="currentPassword">Current Password</label>
+              <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter current password">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+              <label for="newPassword">New Password</label>
+              <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password (min 6 characters)">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+              <label for="confirmPassword">Confirm New Password</label>
+              <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm new password">
+          </div>
       </div>
 
       <div class="full-width">
@@ -65,6 +83,11 @@
           <option value="Philippines">Philippines</option>
           <option value="USA">USA</option>
           <option value="UK">UK</option>
+          <option value="Canada">Canada</option>
+          <option value="Australia">Australia</option>
+          <option value="Japan">Japan</option>
+          <option value="Singapore">Singapore</option>
+          <option value="Malaysia">Malaysia</option>
         </select>
       </div>
 
@@ -79,18 +102,7 @@
     </form>
   </main>
 
-  <script>
-    function loadProfileImage(event) {
-      const output = document.getElementById('profileImage');
-      output.src = URL.createObjectURL(event.target.files[0]);
-      output.onload = function () {
-        URL.revokeObjectURL(output.src);
-      };
-    }
-  </script>
-
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-
   <script src="/js/profile.js"></script>
 
 </body>

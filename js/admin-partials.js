@@ -1,3 +1,4 @@
+// frontend-toyblox/js/admin-partials.js
 // =====================
 // Section Navigation
 // =====================
@@ -21,6 +22,8 @@ navLinks.forEach(link => {
       loadProductManagement();
     } else if (targetId === 'inventory') {
       loadInventorySection();
+    } else if (targetId === 'customers') {
+      loadCustomerManagement();
     }
 
     if (targetSection) {
@@ -109,13 +112,95 @@ function loadProductManagement() {
 // Load Inventory Section
 // =====================
 function loadInventorySection() {
+  console.log('Loading inventory section...');
+  
   const container = document.getElementById('inventoryManagementContainer');
-  if (!container.hasChildNodes()) {
-    $.get('../admin/inventory.html', function (data) {
-      container.innerHTML = data;
-      $.getScript('../js/inventory.js');
+  
+  // Always reload the content to ensure fresh state
+  console.log('Loading fresh inventory content...');
+  
+  // Load inventory.html
+  fetch('../admin/inventory.html')
+    .then(response => {
+      console.log('Inventory HTML response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(html => {
+      console.log('Inventory HTML loaded successfully');
+      container.innerHTML = html;
+      
+      // Wait for DOM to be ready, then initialize inventory
+      setTimeout(() => {
+        initializeInventoryModule();
+      }, 200);
+    })
+    .catch(error => {
+      console.error('Failed to load inventory.html:', error);
+      container.innerHTML = `
+        <div class="error-message" style="padding: 20px; text-align: center; color: red;">
+          <h3>Error Loading Inventory</h3>
+          <p>Failed to load inventory.html: ${error.message}</p>
+          <p>Please check if the file exists at: ../admin/inventory.html</p>
+        </div>
+      `;
     });
+}
+
+// =====================
+// Initialize Inventory Module
+// =====================
+function initializeInventoryModule() {
+  console.log('Initializing inventory module...');
+  
+  // Check if inventory.js is already loaded and has the initializeInventory function
+  if (typeof window.initializeInventory === 'function') {
+    console.log('inventory.js already loaded, calling initializeInventory()');
+    window.initializeInventory();
+    return;
+  }
+  
+  // Load inventory.js if not already loaded
+  if (typeof jQuery !== 'undefined') {
+    // Remove any existing script to prevent conflicts
+    $('script[src*="inventory.js"]').remove();
+    
+    $.getScript('../js/inventory.js')
+      .done(() => {
+        console.log('Inventory JS loaded successfully');
+        // Call the initialization function after script loads
+        setTimeout(() => {
+          if (typeof window.initializeInventory === 'function') {
+            console.log('Calling initializeInventory() after script load');
+            window.initializeInventory();
+          } else {
+            console.error('initializeInventory function not found after loading script');
+          }
+        }, 100);
+      })
+      .fail((jqxhr, settings, exception) => {
+        console.error('Failed to load inventory.js:', exception);
+        console.error('Status:', jqxhr.status);
+        console.error('Response:', jqxhr.responseText);
+        
+        // Show error message to user
+        const container = document.getElementById('inventoryManagementContainer');
+        container.innerHTML += `
+          <div class="script-error" style="margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24;">
+            <strong>Script Loading Error:</strong> Failed to load inventory.js
+            <br>Please check if the file exists at: ../js/inventory.js
+          </div>
+        `;
+      });
   } else {
-    $.getScript('../js/inventory.js');
+    console.error('jQuery not loaded - cannot load inventory.js');
+    const container = document.getElementById('inventoryManagementContainer');
+    container.innerHTML += `
+      <div class="jquery-error" style="margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24;">
+        <strong>jQuery Error:</strong> jQuery is not loaded. Please ensure jQuery is loaded before this script.
+      </div>
+    `;
   }
 }
