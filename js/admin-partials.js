@@ -128,15 +128,20 @@ function loadInventorySection() {
       }
       return response.text();
     })
+
     .then(html => {
       console.log('Inventory HTML loaded successfully');
       container.innerHTML = html;
-      
+
+      // 🔧 Reset initialization flag here
+      inventoryInitialized = false;
+
       // Wait for DOM to be ready, then initialize inventory
       setTimeout(() => {
         initializeInventoryModule();
       }, 200);
     })
+
     .catch(error => {
       console.error('Failed to load inventory.html:', error);
       container.innerHTML = `
@@ -204,3 +209,33 @@ function initializeInventoryModule() {
     `;
   }
 }
+
+// =====================
+// Load Customer Section
+// =====================
+function loadCustomerManagement() {
+  fetch('customer.html')
+    .then(res => res.text())
+    .then(html => {
+      const container = document.getElementById('customerManagementContainer');
+      container.innerHTML = html;
+
+      setTimeout(() => {
+        $.getScript('../js/user.js')
+          .done(() => {
+            if (typeof initializeUserModule === 'function') {
+              initializeUserModule();
+            } else {
+              console.error('initializeUserModule is not defined in user.js');
+            }
+          })
+          .fail(() => {
+            console.error('Failed to load user.js');
+          });
+      }, 100);
+    })
+    .catch(err => {
+      console.error('Failed to load customer.html:', err);
+    });
+}
+

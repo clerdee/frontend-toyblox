@@ -1,7 +1,4 @@
 // frontend-toyblox/js/inventory.js
-// Remove the immediate $(document).ready() wrapper
-// Instead, export a function that can be called when needed
-
 let inventoryInitialized = false;
 
 function initializeInventory() {
