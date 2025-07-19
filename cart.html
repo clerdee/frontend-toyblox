@@ -1,0 +1,478 @@
+<!-- cart.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Cart - ToyBlox</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka+One&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Link to home.html's CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Your cart logic -->
+  <script src="js/cart.js" defer></script>
+
+  <style>
+    /* Additional cart-specific styles */
+    .cart-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 140px 0 80px;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cart-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stars" patternUnits="userSpaceOnUse" width="20" height="20"><circle cx="10" cy="10" r="1" fill="white" opacity="0.3"/></pattern></defs><rect width="100%" height="100%" fill="url(%23stars)"/></svg>');
+      pointer-events: none;
+    }
+
+    .cart-header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .cart-title {
+      font-family: 'Fredoka One', cursive;
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      color: #ffd93d;
+    }
+
+    .cart-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+      margin-bottom: 2rem;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      text-decoration: none;
+      border-radius: 50px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .back-link:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .cart-main {
+      padding: 80px 0;
+      background: #f8f9fa;
+      min-height: 60vh;
+    }
+
+    .cart-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    .cart-items {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .cart-items h2 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.8rem;
+      color: #333;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 100px 1fr auto auto;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      background: #f8f9fa;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .cart-item:hover {
+      background: white;
+      border-color: #ff6b6b;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .item-image {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .item-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .item-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #333;
+    }
+
+    .item-price {
+      color: #4ecdc4;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: white;
+      border-radius: 25px;
+      padding: 0.3rem;
+      border: 2px solid #e0e0e0;
+    }
+
+    .quantity-btn {
+      width: 35px;
+      height: 35px;
+      border: none;
+      background: #ff6b6b;
+      color: white;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+      background: #ff5252;
+      transform: scale(1.1);
+    }
+
+    .quantity-display {
+      min-width: 40px;
+      text-align: center;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .remove-btn {
+      background: #ff4757;
+      color: white;
+      border: none;
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .remove-btn:hover {
+      background: #ff3742;
+      transform: scale(1.1);
+    }
+
+    .cart-summary {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 120px;
+      height: fit-content;
+    }
+
+    .cart-summary h3 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .summary-row.total {
+      border-top: 2px solid #e0e0e0;
+      padding-top: 1rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #4ecdc4;
+    }
+
+    .checkout-btn {
+      width: 100%;
+      padding: 1.2rem;
+      background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    .checkout-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+    }
+
+    .continue-shopping {
+      width: 100%;
+      padding: 1rem;
+      background: transparent;
+      color: #333;
+      border: 2px solid #e0e0e0;
+      border-radius: 50px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .continue-shopping:hover {
+      border-color: #ff6b6b;
+      color: #ff6b6b;
+      transform: translateY(-2px);
+    }
+
+    .empty-cart {
+      text-align: center;
+      padding: 3rem;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-cart-icon {
+      font-size: 5rem;
+      color: #e0e0e0;
+      margin-bottom: 1rem;
+    }
+
+    .empty-cart h3 {
+      font-family: 'Fredoka One', cursive;
+      font-size: 2rem;
+      color: #666;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-cart p {
+      color: #999;
+      margin-bottom: 2rem;
+    }
+
+    .item-total {
+      font-weight: 700;
+      color: #4ecdc4;
+      font-size: 1.1rem;
+    }
+
+    /* Loading state */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+
+    .loading i {
+      font-size: 2rem;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .cart-title {
+        font-size: 2rem;
+      }
+
+      .cart-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .cart-item {
+        grid-template-columns: 80px 1fr auto;
+        gap: 1rem;
+      }
+
+      .quantity-controls {
+        grid-column: 1 / -1;
+        justify-self: start;
+        margin-top: 1rem;
+      }
+
+      .remove-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+
+      .cart-item {
+        position: relative;
+        padding-right: 3rem;
+      }
+
+      .item-total {
+        grid-column: 1 / -1;
+        text-align: left;
+        margin-top: 0.5rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .cart-items,
+      .cart-summary {
+        padding: 1.5rem;
+      }
+
+      .cart-item {
+        padding: 1rem;
+      }
+
+      .item-image {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Cart Header -->
+  <section class="cart-header">
+    <div class="container">
+      <div class="cart-header-content">
+        <h1 class="cart-title">🛒 Your Shopping Cart</h1>
+        <p class="cart-subtitle">Review your items and proceed to checkout</p>
+        <a href="home.html" class="back-link">
+          <i class="fas fa-arrow-left"></i>
+          Continue Shopping
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Cart Content -->
+  <main class="cart-main">
+    <div class="cart-container">
+      <!-- Cart Items -->
+      <div class="cart-items">
+        <h2>
+          <i class="fas fa-shopping-bag"></i>
+          Cart Items
+        </h2>
+        <div id="cartContainer">
+          <!-- Loading state -->
+          <div class="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Loading your cart...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cart Summary -->
+      <div class="cart-summary" id="cartSummary">
+        <h3>Order Summary</h3>
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span>₱<span id="subtotal">0.00</span></span>
+        </div>
+        <div class="summary-row">
+          <span>Shipping:</span>
+          <span>₱<span id="shipping">50.00</span></span>
+        </div>
+        <div class="summary-row">
+          <span>Tax:</span>
+          <span>₱<span id="tax">0.00</span></span>
+        </div>
+        <div class="summary-row total">
+          <span>Total:</span>
+          <span>₱<span id="cartTotal">0.00</span></span>
+        </div>
+        <button class="checkout-btn" id="checkoutBtn">
+          <i class="fas fa-credit-card"></i>
+          Proceed to Checkout
+        </button>
+        <button class="continue-shopping" onclick="window.location.href='home.html'">
+          <i class="fas fa-arrow-left"></i>
+          Continue Shopping
+        </button>
+      </div>
+    </div>
+  </main>
+
+<script src="js/cart.js" defer></script>
+
+</body>
+</html>

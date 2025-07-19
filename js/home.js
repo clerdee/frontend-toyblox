@@ -82,6 +82,10 @@ function initPage() {
   logoutBtn && logoutBtn.addEventListener('click', function () {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('cart'); // ✅ Clear cart on logout
+    if (document.querySelector('.cart-count')) {
+      document.querySelector('.cart-count').textContent = '0'; // Optional: reset visible counter
+    }
     window.location.reload();
   });
 }

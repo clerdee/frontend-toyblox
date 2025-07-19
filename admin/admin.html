@@ -14,7 +14,6 @@ if (!user || user.role !== 'admin') {
     <title>ToyBlox Admin - Kingdom Management</title>
     <link rel="stylesheet" href="../css/admin.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
-    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -26,7 +25,7 @@ if (!user || user.role !== 'admin') {
             </div>
             <div class="admin-actions">
                 <div class="notification-icon">
-                    <span class="notification-count">3</span>
+                    <span class="notification-count">0</span>
                     🔔
                 </div>
                     <div class="admin-profile" id="adminProfile">
@@ -58,8 +57,6 @@ if (!user || user.role !== 'admin') {
                     <ul>
                         <li><a href="#products" class="nav-link">🧸 Products</a></li>
                         <li><a href="#inventory" class="nav-link">📦 Inventory</a></li>
-                        <!-- <li><a href="#add-product" class="nav-link">➕ Add Product</a></li> -->
-                        <!-- <li><a href="#categories" class="nav-link">🏷️ Categories</a></li> -->
                     </ul>
                 </div>
                 
@@ -79,147 +76,85 @@ if (!user || user.role !== 'admin') {
                         <li><a href="#admins" class="nav-link">👑 Admins</a></li>
                     </ul>
                 </div>
-                
-                <!-- <div class="nav-section">
-                    <h3>Settings</h3>
-                    <ul>
-                        <li><a href="#settings" class="nav-link">⚙️ General</a></li>
-                        <li><a href="#reports" class="nav-link">📊 Reports</a></li>
-                    </ul>
-                </div> -->
+        
             </nav>
         </aside>
 
         <!-- Main Content Area -->
         <main class="main-content">
-            <!-- Dashboard Overview -->
-            <section id="dashboard" class="content-section active">
-                <div class="section-header">
-                    <h2>Kingdom Overview</h2>
-                    <div class="header-actions">
-                        <select class="date-filter">
-                            <option>Last 7 days</option>
-                            <option>Last 30 days</option>
-                            <option>Last 90 days</option>
-                        </select>
-                        <button class="btn btn-primary">Export Report</button>
-                    </div>
-                </div>
 
-                <!-- Stats Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon">💰</div>
-                        <div class="stat-info">
-                            <h3>Total Revenue</h3>
-                            <p class="stat-value">$24,567</p>
-                            <span class="stat-change positive">+12.5%</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon">📦</div>
-                        <div class="stat-info">
-                            <h3>Total Orders</h3>
-                            <p class="stat-value">1,234</p>
-                            <span class="stat-change positive">+8.2%</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon">🧸</div>
-                        <div class="stat-info">
-                            <h3>Products</h3>
-                            <p class="stat-value">567</p>
-                            <span class="stat-change neutral">+2.1%</span>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon">👥</div>
-                        <div class="stat-info">
-                            <h3>Customers</h3>
-                            <p class="stat-value">8,901</p>
-                            <span class="stat-change positive">+15.3%</span>
-                        </div>
-                    </div>
-                </div>
+<!-- Dashboard Overview -->
+<section id="dashboard" class="content-section active">
+  <div class="section-header">
+    <h2>Kingdom Overview</h2>
+    <div class="header-actions">
+      <select class="date-filter">
+        <option>Last 7 days</option>
+        <option>Last 30 days</option>
+        <option>Last 90 days</option>
+      </select>
+      <button class="btn btn-primary">Export Report</button>
+    </div>
+  </div>
 
-                <!-- Recent Activity -->
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3>Recent Orders</h3>
-                            <a href="#orders" class="view-all">View All</a>
-                        </div>
-                        <div class="card-content">
-                            <div class="order-item">
-                                <div class="order-info">
-                                    <span class="order-id">#12345</span>
-                                    <span class="customer-name">John Doe</span>
-                                </div>
-                                <div class="order-details">
-                                    <span class="order-amount">$89.99</span>
-                                    <span class="order-status pending">Pending</span>
-                                </div>
-                            </div>
-                            <div class="order-item">
-                                <div class="order-info">
-                                    <span class="order-id">#12344</span>
-                                    <span class="customer-name">Jane Smith</span>
-                                </div>
-                                <div class="order-details">
-                                    <span class="order-amount">$45.99</span>
-                                    <span class="order-status shipped">Shipped</span>
-                                </div>
-                            </div>
-                            <div class="order-item">
-                                <div class="order-info">
-                                    <span class="order-id">#12343</span>
-                                    <span class="customer-name">Bob Johnson</span>
-                                </div>
-                                <div class="order-details">
-                                    <span class="order-amount">$129.99</span>
-                                    <span class="order-status delivered">Delivered</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-info">
+        <h3>Total Orders</h3>
+        <p class="stat-value" id="totalOrders">?</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-info">
+        <h3>Products</h3>
+        <p class="stat-value" id="totalProducts">?</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🧸</div>
+      <div class="stat-info">
+        <h3>Admins</h3>
+        <p class="stat-value" id="totalAdmins">?</p>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div class="stat-info">
+        <h3>Customers</h3>
+        <p class="stat-value" id="totalCustomers">?</p>
+      </div>
+    </div>
+  </div>
 
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h3>Top Products</h3>
-                            <a href="#products" class="view-all">View All</a>
-                        </div>
-                        <div class="card-content">
-                            <div class="product-item">
-                                <div class="product-icon">🦄</div>
-                                <div class="product-info">
-                                    <span class="product-name">Magical Unicorn</span>
-                                    <span class="product-sales">152 sold</span>
-                                </div>
-                                <span class="product-revenue">$4,568</span>
-                            </div>
-                            <div class="product-item">
-                                <div class="product-icon">🚀</div>
-                                <div class="product-info">
-                                    <span class="product-name">Space Explorer Set</span>
-                                    <span class="product-sales">98 sold</span>
-                                </div>
-                                <span class="product-revenue">$4,502</span>
-                            </div>
-                            <div class="product-item">
-                                <div class="product-icon">🏰</div>
-                                <div class="product-info">
-                                    <span class="product-name">Princess Castle</span>
-                                    <span class="product-sales">76 sold</span>
-                                </div>
-                                <span class="product-revenue">$6,839</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+  <!-- Recent Activity -->
+  <div class="dashboard-grid">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>Recent Orders</h3>
+        <a href="#orders" class="view-all">View All</a>
+      </div>
+      <div class="card-content">
+        <!-- Order items -->
+        ...
+      </div>
+    </div>
+
+    <div class="dashboard-card">
+      <div class="card-header">
+        <h3>Top Products</h3>
+        <a href="#products" class="view-all">View All</a>
+      </div>
+      <div class="card-content" id="topProductsContainer">
+        <!-- Product items -->
+
+      </div>
+    </div>
+  </div>
+</section>
+
         </main>
 
             <!-- Products Management -->
@@ -236,7 +171,12 @@ if (!user || user.role !== 'admin') {
             <section id="customers" class="content-section">
                 <div id="customerManagementContainer"></div>
             </section>
-        
+
+            <!-- Admin Management -->
+            <section id="admins" class="content-section">
+                <div id="adminManagementContainer"></div>
+            </section>
+
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -246,8 +186,10 @@ if (!user || user.role !== 'admin') {
 
     <script src="../js/config.js"></script>
     <script src="../js/item.js"></script>
+    <script src="../js/statscard.js"></script>
     <script src="../js/inventory.js"></script>
     <script src="../js/user.js"></script>
+     <script src="../js/user-admin.js"></script>
     <script src="../js/admin-partials.js"></script>
 
     <script>
@@ -270,7 +212,28 @@ if (!user || user.role !== 'admin') {
       }
     });
   });
+    </script>
+
+    <script>
+$(document).ready(function () {
+  // Section navigation
+  $(".nav-link").on("click", function (e) {
+    e.preventDefault();
+
+    // Remove 'active' class from all nav links
+    $(".nav-link").removeClass("active");
+    $(this).addClass("active");
+
+    // Hide all content sections
+    $(".content-section").removeClass("active");
+
+    // Get the section ID from the link's href
+    const targetSection = $(this).attr("href");
+    $(targetSection).addClass("active");
+  });
+});
 </script>
+
 
 </body>
 </html>

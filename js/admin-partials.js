@@ -24,6 +24,8 @@ navLinks.forEach(link => {
       loadInventorySection();
     } else if (targetId === 'customers') {
       loadCustomerManagement();
+    } else if (targetId === 'admins') {
+      loadAdminManagement(); 
     }
 
     if (targetSection) {
@@ -236,6 +238,43 @@ function loadCustomerManagement() {
     })
     .catch(err => {
       console.error('Failed to load customer.html:', err);
+    });
+}
+
+// =====================
+// Load Admin Section
+// =====================
+function loadAdminManagement() {
+  fetch('user-admin.html') // Make sure this path is correct relative to your admin dashboard
+    .then(res => res.text())
+    .then(html => {
+      const container = document.getElementById('adminManagementContainer');
+      container.innerHTML = html;
+
+      // Load associated JS script
+      setTimeout(() => {
+        $.getScript('../js/user-admin.js')
+          .done(() => {
+            if (typeof initializeAdminModule === 'function') {
+              initializeAdminModule();
+            } else {
+              console.error('initializeAdminModule is not defined in admin.js');
+            }
+          })
+          .fail(() => {
+            console.error('Failed to load admin.js');
+          });
+      }, 100);
+    })
+    .catch(err => {
+      console.error('Failed to load admin.html:', err);
+      const container = document.getElementById('adminManagementContainer');
+      container.innerHTML = `
+        <div class="error-message" style="padding: 20px; text-align: center; color: red;">
+          <h3>Error Loading Admin Section</h3>
+          <p>${err.message}</p>
+        </div>
+      `;
     });
 }
 

@@ -18,11 +18,17 @@ document.getElementById('login-form').addEventListener('submit', async function(
     const result = await response.json();
 
     if (response.ok) {
+      // Block access if deleted_at is not null
+      if (result.user.deleted_at) {
+        showNotification('Account deactivated. Please contact admin.', true);
+        return;
+      }
+
       showNotification('Login successful! Redirecting...');
       localStorage.setItem('user', JSON.stringify(result.user));
-      localStorage.setItem('token', result.token); // If your backend returns a token
+      localStorage.setItem('token', result.token);
+
       setTimeout(() => {
-        // Redirect based on role
         if (result.user.role === 'admin') {
           window.location.href = 'admin/admin.html';
         } else {

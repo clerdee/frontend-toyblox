@@ -412,6 +412,15 @@ body {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+.product-image img.product-thumb {
+  max-width: 100%;
+  height: 150px;
+  object-fit: contain;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+
 .product-info {
     padding: 1.5rem;
 }
