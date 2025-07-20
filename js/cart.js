@@ -1,79 +1,160 @@
-// cart.js
+// frontend/js/cart.js
 
-/**
- * Adds a product to the cart. If already in the cart, increases quantity.
- * @param {Object} product - Must include: id, name, price, emoji (optional)
- */
-function addToCart(product) {
+document.addEventListener("DOMContentLoaded", () => {
+  updateCartCount();
+  fetchCustomerInfo();
+
+  if (document.getElementById("cartContainer")) {
+    setTimeout(() => {
+      hideLoading();
+      loadCartItems();
+    }, 800);
+  }
+
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener("click", checkout);
+  }
+});
+
+// ==============================
+// Customer Logic
+// ==============================
+
+function fetchCustomerInfo() {
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  if (!token || !user?.id) {
+    console.warn("Cannot fetch customer info: token or user missing.");
+    // Don't try to update customer info elements if we're not on the cart page
+    if (!document.getElementById("custName")) return;
+    return;
+  }
+
+  $.ajax({
+    url: `http://localhost:4000/api/customer/me?user_id=${user.id}`,
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    success: function (data) {
+      // Save to localStorage if needed
+      localStorage.setItem("customer", JSON.stringify(data));
+      console.log("Customer info saved to localStorage:", data);
+
+      // Only try to populate HTML fields if they exist
+      if (document.getElementById("custName")) {
+        document.getElementById("custName").textContent = `${data.f_name} ${data.l_name}`;
+        document.getElementById("custEmail").textContent = data.email;
+        document.getElementById("custPhone").textContent = data.phone_number || "N/A";
+        document.getElementById("custCountry").textContent = data.country || "N/A";
+        document.getElementById("custAddress").textContent = data.address || "N/A";
+        document.getElementById("custPostal").textContent = data.postal_code || "N/A";
+
+        const now = new Date();
+        const formatted = now.toLocaleString('en-PH', { 
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+        document.getElementById("custDatePlaced").textContent = formatted;
+      }
+    },
+    error: function (xhr) {
+      console.error("Failed to fetch customer info:", xhr.responseText);
+    }
+  });
+}
+
+
+// ==============================
+// Cart Logic
+// ==============================
+
+function getCart() {
+  return JSON.parse(localStorage.getItem("cart")) || [];
+}
+
+function setCart(cart) {
+  localStorage.setItem("cart", JSON.stringify(cart));
+}
+
+function updateCartCount() {
   const cart = getCart();
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const countEl = document.querySelector(".cart-count") || document.getElementById("headerCartCount");
+  if (countEl) countEl.textContent = totalItems;
+}
 
-  // Normalize the product structure
+function addToCart(product) {
+  // Check if user is logged in
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user || !user.id) {
+    showNotification("Please log in first before adding to cart.", true);
+    return;
+  }
+  
+  const cart = getCart();
   const item = {
-    id: product.id || product.item_id, 
+    id: product.id || product.item_id,
     name: product.name,
-    price: parseFloat(product.price || product.sell_price || 0), 
-    image: product.image || product.image_url || '', 
-    emoji: product.emoji || '🧸', 
-    quantity: 1
+    price: parseFloat(product.price || product.sell_price || 0),
+    image: product.image || product.image_url || "",
+    emoji: product.emoji || "🧸",
+    quantity: 1,
   };
 
-  const existingItem = cart.find(cartItem => cartItem.id === item.id);
-
-  if (existingItem) {
-    existingItem.quantity += 1;
+  const existing = cart.find((i) => i.id === item.id);
+  if (existing) {
+    existing.quantity += 1;
   } else {
     cart.push(item);
   }
 
   setCart(cart);
   updateCartCount();
-  alert(`🧸 Added "${item.name}" to cart!`);
+  showNotification(`🛒 "${item.name}" added to cart!`);
 }
 
-
-/**
- * Retrieves the cart array from localStorage.
- * @returns {Array}
- */
-function getCart() {
-  return JSON.parse(localStorage.getItem("cart")) || [];
+// Add this notification function if it doesn't exist elsewhere in your code
+function showNotification(message, isError = false) {
+  let notif = document.createElement('div');
+  notif.className = 'custom-notification' + (isError ? ' error' : '');
+  notif.textContent = message;
+  document.body.appendChild(notif);
+  
+  // Add some basic styles if they don't exist in your CSS
+  notif.style.position = 'fixed';
+  notif.style.top = '20px';
+  notif.style.right = '20px';
+  notif.style.padding = '10px 20px';
+  notif.style.borderRadius = '5px';
+  notif.style.backgroundColor = isError ? '#f44336' : '#4CAF50';
+  notif.style.color = 'white';
+  notif.style.zIndex = '1000';
+  notif.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+  
+  setTimeout(() => {
+    notif.style.opacity = '0';
+    notif.style.transition = 'opacity 0.5s';
+    setTimeout(() => notif.remove(), 500);
+  }, 2000);
 }
 
-/**
- * Saves the updated cart array to localStorage.
- * @param {Array} cart
- */
-function setCart(cart) {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
-
-/**
- * Updates the visible cart count in the header.
- * Expects an element with class `.cart-count` or `#headerCartCount`.
- */
-function updateCartCount() {
-  const cart = getCart();
-  const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-  // Try both class-based and ID-based cart counters
-  const countEl = document.querySelector(".cart-count") || document.getElementById("headerCartCount");
-  if (countEl) countEl.textContent = total;
-}
-
-/**
- * Loads cart items into the cart page (cart.html).
- */
 function loadCartItems() {
-  const cartContainer = document.getElementById("cartContainer");
+  const container = document.getElementById("cartContainer");
   const cart = getCart();
 
-  if (cart.length === 0) {
-    cartContainer.innerHTML = `
+  if (!cart.length) {
+    container.innerHTML = `
       <div class="empty-cart">
         <div class="empty-cart-icon">🛒</div>
         <h3>Your cart is empty</h3>
         <p>Looks like you haven't added any toys to your cart yet.</p>
-        <button class="btn-primary" onclick="window.location.href='home.html'">
+        <button class="btn-primary" onclick="redirectToHome()">
           <i class="fas fa-shopping-bag"></i> Start Shopping
         </button>
       </div>`;
@@ -81,19 +162,18 @@ function loadCartItems() {
     return;
   }
 
-  let cartHTML = '';
+  let html = '';
   let subtotal = 0;
 
   cart.forEach((item, index) => {
-    console.log("Item in cart:", item);
     const itemTotal = item.price * item.quantity;
     subtotal += itemTotal;
 
-    cartHTML += `
+    html += `
       <div class="cart-item" data-index="${index}">
-<div class="item-image">
-  ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:50px;height:50px;">` : (item.emoji || '🧸')}
-</div>
+        <div class="item-image">
+          ${item.image ? `<img src="${item.image}" alt="${item.name}" style="width:50px;height:50px;">` : item.emoji}
+        </div>
         <div class="item-details">
           <div class="item-name">${item.name}</div>
           <div class="item-price">₱${item.price.toFixed(2)} each</div>
@@ -110,33 +190,24 @@ function loadCartItems() {
       </div>`;
   });
 
-  cartContainer.innerHTML = cartHTML;
+  container.innerHTML = html;
   updateCartSummary(subtotal);
 }
 
-/**
- * Adjusts the quantity of a cart item.
- * Removes the item if quantity falls below 1.
- * @param {number} index - Index of the item in the cart
- * @param {number} change - Quantity change (+1 or -1)
- */
 function updateQuantity(index, change) {
   const cart = getCart();
-  if (cart[index]) {
-    cart[index].quantity += change;
-    if (cart[index].quantity <= 0) {
-      cart.splice(index, 1);
-    }
-    setCart(cart);
-    loadCartItems();
-    updateCartCount();
+  if (!cart[index]) return;
+
+  cart[index].quantity += change;
+  if (cart[index].quantity <= 0) {
+    cart.splice(index, 1);
   }
+
+  setCart(cart);
+  loadCartItems();
+  updateCartCount();
 }
 
-/**
- * Removes an item completely from the cart.
- * @param {number} index
- */
 function removeItem(index) {
   const cart = getCart();
   cart.splice(index, 1);
@@ -145,10 +216,6 @@ function removeItem(index) {
   updateCartCount();
 }
 
-/**
- * Updates the summary section (subtotal, shipping, tax, total).
- * @param {number} subtotal
- */
 function updateCartSummary(subtotal) {
   const shipping = subtotal > 0 ? 50 : 0;
   const tax = subtotal * 0.12;
@@ -160,40 +227,69 @@ function updateCartSummary(subtotal) {
   document.getElementById("cartTotal").textContent = total.toFixed(2);
 
   const summary = document.getElementById("cartSummary");
-  summary.style.display = subtotal === 0 ? 'none' : 'block';
+  if (summary) summary.style.display = subtotal > 0 ? "block" : "none";
 }
 
-/**
- * Simulates the checkout process.
- * Clears the cart and redirects.
- */
 function checkout() {
   const cart = getCart();
-  if (cart.length === 0) {
-    alert("Your cart is empty!");
-    return;
-  }
+  const customer = JSON.parse(localStorage.getItem("customer"));
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
 
-  alert("🎉 Thank you for your purchase!");
-  localStorage.removeItem("cart");
+  if (!cart.length) return alert("Your cart is empty!");
+
+  const datePlaced = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+  const orderData = {
+    user_id: user.id,
+    customer_id: customer.id,
+    items: cart.map(item => ({
+      item_id: item.id,
+      quantity: item.quantity,
+      price: item.price
+    })),
+    date_placed: datePlaced
+  };
+
+  // Show loading state
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  checkoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+  checkoutBtn.disabled = true;
+
+  $.ajax({
+    url: "http://localhost:4000/api/orders",
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    data: JSON.stringify(orderData),
+    success: function (response) {
+      // Show success message
+      alert("🎉 Order placed successfully! Check your email for confirmation.");
+      localStorage.removeItem("cart");
+      window.location.href = "home.html";
+    },
+    error: function (xhr) {
+      console.error("Order submission failed:", xhr.responseText);
+      alert("Failed to submit order.");
+      
+      // Reset button state
+      checkoutBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Checkout';
+      checkoutBtn.disabled = false;
+    }
+  });
+}
+
+// ==============================
+// Optional Utilities
+// ==============================
+
+function redirectToHome() {
   window.location.href = "home.html";
 }
 
-// Initial setup after DOM is ready
-document.addEventListener("DOMContentLoaded", () => {
-  updateCartCount();
-
-  // For cart.html
-  if (document.getElementById("cartContainer")) {
-    setTimeout(() => {
-      const loading = document.querySelector(".loading");
-      if (loading) loading.style.display = "none";
-      loadCartItems();
-    }, 1000);
-  }
-
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener("click", checkout);
-  }
-});
+function hideLoading() {
+  const loader = document.querySelector(".loading");
+  if (loader) loader.style.display = "none";
+}

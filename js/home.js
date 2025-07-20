@@ -1,25 +1,12 @@
+// frontend-toyblox/js/home.js
 document.addEventListener('DOMContentLoaded', function () {
+
   const urlParams = new URLSearchParams(window.location.search);
   const tokenFromUrl = urlParams.get('token');
   const idFromUrl = urlParams.get('id');
   const nameFromUrl = urlParams.get('name');
 
   if (tokenFromUrl && idFromUrl && nameFromUrl) {
-    const user = {
-      id: Number(idFromUrl),
-      f_name: decodeURIComponent(nameFromUrl),
-      role: 'user'
-    };
-
-    localStorage.setItem('token', tokenFromUrl);
-    localStorage.setItem('user', JSON.stringify(user));
-
-    // ✅ Add your protected API call *after* localStorage is ready
-  setTimeout(() => {
-    fetchUserDetails(user.id);
-  }, 200); // delay can be adjusted if needed
-
-    // Remove query string from URL
     window.history.replaceState({}, document.title, window.location.pathname);
   }
 
@@ -46,8 +33,6 @@ async function fetchUserDetails(userId) {
     const user = await res.json();
     console.log('✅ User fetched after verification:', user);
 
-    // Optionally update localStorage again if more info is needed
-    // localStorage.setItem('user', JSON.stringify(user));
   } catch (error) {
     console.error('❌ Network error:', error);
   }
@@ -82,9 +67,10 @@ function initPage() {
   logoutBtn && logoutBtn.addEventListener('click', function () {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    localStorage.removeItem('cart'); // ✅ Clear cart on logout
+    localStorage.removeItem("customer");
+    localStorage.removeItem('cart'); 
     if (document.querySelector('.cart-count')) {
-      document.querySelector('.cart-count').textContent = '0'; // Optional: reset visible counter
+      document.querySelector('.cart-count').textContent = '0'; 
     }
     window.location.reload();
   });
@@ -250,7 +236,11 @@ addToCartButtons.forEach(button => {
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+        // Check if href is just '#' or empty
+        if (href === '#' || href === '') return;
+        
+        const target = document.querySelector(href);
         if (target) {
             target.scrollIntoView({
                 behavior: 'smooth'
