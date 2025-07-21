@@ -1,73 +1,119 @@
-$(document).ready(function () {
-  const token = localStorage.getItem("token");
+// frontend-toyblox/js/statscard.js
 
-  if (!token) {
-    console.error("Unauthorized: No token found");
-    return;
-  }
+$(document).ready(function() {
+  loadDashboardStats();
+  loadRecentOrders();
+  loadTopProducts();
+});
 
-  // STATS FETCH
+function loadDashboardStats() {
   $.ajax({
-    url: `${baseUrl}api/admin/stats`,
-    method: "GET",
+    url: 'http://localhost:4000/api/admin/stats',
+    method: 'GET',
     headers: {
-      Authorization: `Bearer ${token}`,
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
-    success: function (data) {
-      $("#totalOrders").text(data.totalOrders);
-      $("#orderChange").text(`${formatChange(data.orderChange)}`);
-
-      $("#totalProducts").text(data.totalProducts);
-      $("#productChange").text(`${formatChange(data.productChange)}`);
-
-      $("#totalAdmins").text(data.totalAdmins);
-      $("#adminChange").text(`${formatChange(data.adminChange)}`);
-
-      $("#totalCustomers").text(data.totalCustomers);
-      $("#customerChange").text(`${formatChange(data.customerChange)}`);
+    success: function(data) {
+      // Update stats cards with actual data from database
+      $('#totalOrders').text(data.totalOrders);
+      $('#totalProducts').text(data.totalProducts);
+      $('#totalAdmins').text(data.totalAdmins);
+      $('#totalCustomers').text(data.totalCustomers);
     },
-    error: function (err) {
-      console.error("Failed to fetch stats:", err.responseText || err);
+    error: function(xhr) {
+      console.error('Failed to load dashboard stats:', xhr.responseText);
     }
   });
+}
 
-  function formatChange(value) {
-    const sign = value >= 0 ? "+" : "";
-    return `${sign}${value.toFixed(1)}%`;
-  }
-
-  // TOP PRODUCTS FETCH
+function loadRecentOrders() {
   $.ajax({
-    url: `${baseUrl}api/admin/top-products`,
-    method: "GET",
+    url: 'http://localhost:4000/api/orders/stats',
+    method: 'GET',
     headers: {
-      Authorization: `Bearer ${token}`
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
     },
-    success: function (response) {
-      const container = $("#topProductsContainer");
-      container.empty();
-
-      if (response.length === 0) {
-        container.append("<p>No top products available.</p>");
+    success: function(data) {
+      if (!data.recentOrders || !Array.isArray(data.recentOrders)) {
+        $('#recentOrdersContainer').html('<p class="no-data">No recent orders data available.</p>');
         return;
       }
-
-      response.forEach(product => {
-        const imageUrl = `${baseUrl}${product.image_url}`; // ✅ FIXED URL
-        const productHtml = `
-        <div class="product-item" style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
-            <img src="${imageUrl}" alt="${product.name}" class="product-thumb" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
-            <div class="product-info" style="flex-grow: 1;">
-            <span class="product-name" style="font-weight: bold;">${product.name}</span>
+      
+      const recentOrdersHtml = data.recentOrders.map(order => {
+        const date = new Date(order.date_placed).toLocaleDateString();
+        const statusClasses = {
+          'pending': 'status-pending',
+          'processing': 'status-processing',
+          'shipped': 'status-shipped',
+          'delivered': 'status-delivered',
+          'cancelled': 'status-cancelled'
+        };
+        
+        return `
+          <div class="order-item">
+            <div class="order-info">
+              <h4>Order #${order.id}</h4>
+              <p>${order.f_name} ${order.l_name} - ${date}</p>
             </div>
-            <span class="product-revenue" style="font-weight: bold; color: #28a745;">₱${parseFloat(product.sell_price).toFixed(2)}</span>
-        </div>
+            <div class="order-status">
+              <span class="status-badge ${statusClasses[order.status] || ''}">${order.status.toUpperCase()}</span>
+              <p class="order-total">$${parseFloat(order.total_amount).toFixed(2)}</p>
+            </div>
+          </div>
         `;
-        container.append(productHtml);
-      });
+      }).join('');
+      
+      // Find the card-content div inside the Recent Orders card
+      const recentOrdersContainer = $('#recentOrdersContainer');
+      
+      if (recentOrdersContainer.length) {
+        if (data.recentOrders.length > 0) {
+          recentOrdersContainer.html(recentOrdersHtml);
+        } else {
+          recentOrdersContainer.html('<p class="no-data">No recent orders found.</p>');
+        }
+      }
     },
-    error: function (xhr) {
-      console.error("Failed to load top products:", xhr.responseText);
+    error: function(xhr) {
+      console.error('Failed to load recent orders:', xhr.responseText);
+      $('#recentOrdersContainer').html('<p class="no-data">Failed to load recent orders.</p>');
     }
   });
-});
+}
+
+function loadTopProducts() {
+  $.ajax({
+    url: 'http://localhost:4000/api/admin/top-products',
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`
+    },
+    success: function(data) {
+      const topProductsHtml = data.map(product => {
+        return `
+          <div class="product-item">
+            <img src="${product.image_url ? 'http://localhost:4000/' + product.image_url : '../images/default-product.jpg'}" alt="${product.name}" class="product-image">
+            <div class="product-info">
+              <h4>${product.name}</h4>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      // Find the card-content div inside the Top Products card
+      const topProductsContainer = $('#topProductsContainer');
+      
+      if (topProductsContainer.length) {
+        if (data.length > 0) {
+          topProductsContainer.html(topProductsHtml);
+        } else {
+          topProductsContainer.html('<p class="no-data">No products found.</p>');
+        }
+      }
+    },
+    error: function(xhr) {
+      console.error('Failed to load top products:', xhr.responseText);
+      $('#topProductsContainer').html('<p class="no-data">Failed to load top products.</p>');
+    }
+  });
+}

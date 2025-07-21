@@ -237,6 +237,13 @@ function checkout() {
   const token = localStorage.getItem("token");
 
   if (!cart.length) return alert("Your cart is empty!");
+  
+  // Check if customer information is complete
+  if (!customer || !customer.address || !customer.postal_code || !customer.country || !customer.phone_number) {
+    // Show modal to enter customer information
+    showCustomerInfoModal();
+    return;
+  }
 
   const datePlaced = new Date().toISOString().slice(0, 19).replace("T", " ");
 
@@ -279,6 +286,107 @@ function checkout() {
       checkoutBtn.disabled = false;
     }
   });
+}
+
+// Add this function to show a modal for entering customer information
+function showCustomerInfoModal() {
+  // Create modal if it doesn't exist
+  let modal = document.getElementById('customerInfoModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'customerInfoModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Complete Your Profile</h2>
+        <p>Please provide your shipping information to continue with checkout.</p>
+        <form id="customerInfoForm">
+          <div class="form-group">
+            <label for="address">Address</label>
+            <input type="text" id="address" name="address" required>
+          </div>
+          <div class="form-group">
+            <label for="postalCode">Postal Code</label>
+            <input type="text" id="postalCode" name="postal_code" required>
+          </div>
+          <div class="form-group">
+            <label for="country">Country</label>
+            <input type="text" id="country" name="country" required>
+          </div>
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <input type="text" id="phoneNumber" name="phone_number" required>
+          </div>
+          <button type="submit" class="btn-primary">Save Information</button>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Add event listeners
+    const closeBtn = modal.querySelector('.close');
+    closeBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    
+    const form = modal.querySelector('#customerInfoForm');
+    form.addEventListener('submit', saveCustomerInfo);
+  }
+  
+  // Show the modal
+  modal.style.display = 'block';
+}
+
+// Function to save customer information
+async function saveCustomerInfo(e) {
+  e.preventDefault();
+  
+  const token = localStorage.getItem('token');
+  const user = JSON.parse(localStorage.getItem('user'));
+  
+  if (!token || !user) {
+    alert('You must be logged in to update your information.');
+    return;
+  }
+  
+  const formData = new FormData(e.target);
+  const customerData = {
+    user_id: user.id,
+    address: formData.get('address'),
+    postal_code: formData.get('postal_code'),
+    country: formData.get('country'),
+    phone_number: formData.get('phone_number')
+  };
+  
+  try {
+    const response = await fetch('http://localhost:4000/api/customer', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(customerData)
+    });
+    
+    const result = await response.json();
+    
+    if (response.ok) {
+      // Update local storage
+      localStorage.setItem('customer', JSON.stringify(result));
+      
+      // Close modal
+      document.getElementById('customerInfoModal').style.display = 'none';
+      
+      // Proceed with checkout
+      checkout();
+    } else {
+      alert(`Failed to save information: ${result.error}`);
+    }
+  } catch (error) {
+    console.error('Error saving customer information:', error);
+    alert('An error occurred while saving your information.');
+  }
 }
 
 // ==============================

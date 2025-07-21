@@ -26,6 +26,10 @@ navLinks.forEach(link => {
       loadCustomerManagement();
     } else if (targetId === 'admins') {
       loadAdminManagement(); 
+    } else if (targetId === 'orders' || targetId === 'pending' || targetId === 'shipped') {
+      loadOrdersSection(targetId);
+    } else if (targetId === 'analytics') {
+      loadAnalyticsSection();
     }
 
     if (targetSection) {
@@ -273,6 +277,117 @@ function loadAdminManagement() {
         <div class="error-message" style="padding: 20px; text-align: center; color: red;">
           <h3>Error Loading Admin Section</h3>
           <p>${err.message}</p>
+        </div>
+      `;
+    });
+}
+
+// =====================
+// Load Orders Section
+// =====================
+function loadOrdersSection(filterType) {
+  // Create orders section if it doesn't exist
+  if (!document.getElementById('orders')) {
+    const ordersSection = document.createElement('section');
+    ordersSection.id = 'orders';
+    ordersSection.className = 'content-section';
+    document.querySelector('.main-content').appendChild(ordersSection);
+  }
+  
+  const container = document.getElementById('orders');
+  container.classList.add('active');
+  
+  // Load orders.html
+  fetch('../admin/orders.html')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(html => {
+      container.innerHTML = html;
+      
+      // Load orders.js
+      setTimeout(() => {
+        $.getScript('../js/orders.js')
+          .done(() => {
+            console.log('Orders JS loaded successfully');
+            if (typeof window.initializeOrdersModule === 'function') {
+              window.initializeOrdersModule();
+              
+              // Apply filter if specified
+              if (filterType === 'pending' || filterType === 'shipped') {
+                $('#orderStatusFilter').val(filterType).trigger('change');
+              }
+            } else {
+              console.error('initializeOrdersModule function not found');
+            }
+          })
+          .fail((jqxhr, settings, exception) => {
+            console.error('Failed to load orders.js:', exception);
+          });
+      }, 100);
+    })
+    .catch(error => {
+      console.error('Failed to load orders.html:', error);
+      container.innerHTML = `
+        <div class="error-message" style="padding: 20px; text-align: center; color: red;">
+          <h3>Error Loading Orders</h3>
+          <p>Failed to load orders.html: ${error.message}</p>
+        </div>
+      `;
+    });
+}
+
+// =====================
+// Load Analytics Section
+// =====================
+function loadAnalyticsSection() {
+  // Create analytics section if it doesn't exist
+  if (!document.getElementById('analytics')) {
+    const analyticsSection = document.createElement('section');
+    analyticsSection.id = 'analytics';
+    analyticsSection.className = 'content-section';
+    document.querySelector('.main-content').appendChild(analyticsSection);
+  }
+  
+  const container = document.getElementById('analytics');
+  container.classList.add('active');
+  
+  // Load analytics.html
+  fetch('../admin/analytics.html')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(html => {
+      container.innerHTML = html;
+      
+      // Load analytics.js
+      setTimeout(() => {
+        $.getScript('../js/analytics.js')
+          .done(() => {
+            console.log('Analytics JS loaded successfully');
+            if (typeof window.initializeAnalyticsModule === 'function') {
+              window.initializeAnalyticsModule();
+            } else {
+              console.error('initializeAnalyticsModule function not found');
+            }
+          })
+          .fail((jqxhr, settings, exception) => {
+            console.error('Failed to load analytics.js:', exception);
+          });
+      }, 100);
+    })
+    .catch(error => {
+      console.error('Failed to load analytics.html:', error);
+      container.innerHTML = `
+        <div class="error-message" style="padding: 20px; text-align: center; color: red;">
+          <h3>Error Loading Analytics</h3>
+          <p>Failed to load analytics.html: ${error.message}</p>
         </div>
       `;
     });

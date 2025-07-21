@@ -1,0 +1,44 @@
+<!-- analytics.html - Will be loaded into admin.html -->
+<div class="section-header">
+  <h2>Analytics Dashboard</h2>
+  <div class="header-actions">
+    <select class="date-filter" id="analyticsDateFilter">
+      <option value="7">Last 7 days</option>
+      <option value="30">Last 30 days</option>
+      <option value="90">Last 90 days</option>
+      <option value="365">Last year</option>
+    </select>
+    <button class="btn btn-primary" id="refreshAnalyticsBtn">
+      <i class="fas fa-sync-alt"></i> Refresh
+    </button>
+  </div>
+</div>
+
+<div class="analytics-grid">
+  <div class="analytics-card">
+    <div class="card-header">
+      <h3>Monthly Sales</h3>
+    </div>
+    <div class="card-content">
+      <canvas id="monthlySalesChart"></canvas>
+    </div>
+  </div>
+  
+  <div class="analytics-card">
+    <div class="card-header">
+      <h3>Order Status Distribution</h3>
+    </div>
+    <div class="card-content">
+      <canvas id="orderStatusChart"></canvas>
+    </div>
+  </div>
+  
+  <div class="analytics-card">
+    <div class="card-header">
+      <h3>User Distribution</h3>
+    </div>
+    <div class="card-content">
+      <canvas id="userDistributionChart"></canvas>
+    </div>
+  </div>
+</div>

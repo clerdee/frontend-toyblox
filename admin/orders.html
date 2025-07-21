@@ -1,0 +1,90 @@
+<!-- orders.html -->
+<div class="section-header">
+  <h2>Order Management</h2>
+  <div class="header-actions">
+    <select id="orderStatusFilter" class="form-control">
+      <option value="">All Statuses</option>
+      <option value="pending">Pending</option>
+      <option value="shipped">Shipped</option>
+      <option value="delivered">Delivered</option>
+    </select>
+    <button id="exportOrdersBtn" class="btn btn-primary">Export Orders</button>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table id="ordersTable" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="ordersTableBody">
+          <!-- Orders will be loaded here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Order Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="orderDetailsContent">
+        <!-- Order details will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="updateStatusBtn">Update Status</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+
+    if (typeof window.loadOrdersDataTable === 'function') {
+      window.loadOrdersDataTable();
+    } else {
+      console.error('loadOrdersDataTable function not found');
+    }
+    
+    // Refresh button
+    $('#refreshOrdersBtn').on('click', function() {
+      if (typeof window.loadOrdersDataTable === 'function') {
+        window.loadOrdersDataTable();
+      }
+    });
+    
+    // Status filter
+    $('.status-filter').on('change', function() {
+      const status = $(this).val();
+      const table = $('#ordersTable').DataTable();
+      
+      if (status === 'all') {
+        table.column(5).search('').draw();
+      } else {
+        table.column(5).search(status).draw();
+      }
+    });
+    
+    // Close modal
+    $('.close').on('click', function() {
+      $('#orderDetailsModal').hide();
+    });
+  });
+</script>
