@@ -107,13 +107,13 @@ function loadOrdersDataTable() {
         { 
           data: null,
           render: function(data) {
-            return `${data.customer_name || 'Customer'} <br><small>${data.customer_email || ''}</small>`;
+            return `${data.f_name} ${data.l_name} <br><small>${data.email}</small>`;
           }
         },
         { 
-          data: null,
-          render: function(data) {
-            return `${data.item_count} items`;
+          data: 'items_detail',
+          render: function(data, type, row) {
+            return data || 'No items';
           }
         },
         { 
@@ -137,15 +137,17 @@ function loadOrdersDataTable() {
         },
         { 
           data: null,
-          render: function(data) {
+          render: function(data, type, row) {
             return `
               <div class="order-actions">
-                <select class="status-select" data-order-id="${data.id}" data-current="${data.status}">
-                  <option value="pending" ${data.status === 'pending' ? 'selected' : ''}>Pending</option>
-                  <option value="shipped" ${data.status === 'shipped' ? 'selected' : ''}>Shipped</option>
-                  <option value="delivered" ${data.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                <select class="status-select form-control" data-order-id="${row.id}" data-current="${row.status}">
+                  <option value="pending" ${row.status === 'pending' ? 'selected' : ''}>Pending</option>
+                  <option value="shipped" ${row.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                  <option value="delivered" ${row.status === 'delivered' ? 'selected' : ''}>Delivered</option>
                 </select>
-                <button class="btn-view" data-order-id="${data.id}">View</button>
+                <button class="btn btn-sm btn-info view-order" title="View Details" data-order-id="${row.id}">
+                  <i class="fas fa-eye"></i>
+                </button>
               </div>
             `;
           }
@@ -170,7 +172,7 @@ function loadOrdersDataTable() {
         });
         
         // Add event listeners to view buttons
-        $('.btn-view').on('click', function() {
+        $('#ordersTable tbody').on('click', '.view-order', function() {
           const orderId = $(this).data('order-id');
           viewOrderDetails(orderId);
         });
@@ -184,44 +186,101 @@ function loadOrdersDataTable() {
 }
 
 // Update order status
-function updateOrderStatus(orderId, newStatus) {
-  const token = localStorage.getItem('token');
-  if (!token) return;
+// function updateOrderStatus(orderId, newStatus) {
+//   const token = localStorage.getItem('token');
+//   if (!token) return;
 
-  fetch(`http://localhost:4000/api/orders/${orderId}/status`, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ status: newStatus })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      // Show success notification
-      showNotification(`Order #${orderId} status updated to ${newStatus}`, false);
-      
-      // Refresh data if needed
-      if (document.getElementById('recentOrdersContainer')) {
-        loadRecentOrders();
-      }
-    } else {
-      showNotification(`Failed to update order status: ${data.error}`, true);
-    }
-  })
-  .catch(error => {
-    console.error('Error updating order status:', error);
-    showNotification('Failed to update order status', true);
-  });
-}
+//   fetch(`http://localhost:4000/api/orders/${orderId}/status`, {
+//     method: 'PUT',
+//     headers: {
+//       'Authorization': `Bearer ${token}`,
+//       'Content-Type': 'application/json'
+//     },
+//     body: JSON.stringify({ status: newStatus })
+//   })
+//   .then(response => response.json())
+//   .then(data => {
+//     showNotification(`Order #${orderId} status updated to ${newStatus}`, false);
+//     $('#ordersTable').DataTable().ajax.reload();
+//   })
+//   .catch(error => {
+//     console.error('Error updating order status:', error);
+//     showNotification('Failed to update order status', true);
+//   });
+// }
 
 // View order details
-function viewOrderDetails(orderId) {
-  // Implement order details view
-  console.log(`Viewing order details for order #${orderId}`);
-  // This could open a modal with detailed order information
+// function viewOrderDetails(orderId) {
+//   const token = localStorage.getItem('token');
+//   if (!token) return;
+
+//   fetch(`http://localhost:4000/api/orders/${orderId}`, {
+//     headers: {
+//       'Authorization': `Bearer ${token}`
+//     }
+//   })
+//   .then(response => response.json())
+//   .then(order => {
+//     const modalBody = document.getElementById('orderDetailsContent');
+//     let itemsHtml = order.items.map(item => `
+//       <tr>
+//         <td>${item.name}</td>
+//         <td>${item.quantity}</td>
+//         <td>$${parseFloat(item.price_at_order).toFixed(2)}</td>
+//       </tr>
+//     `).join('');
+
+//     modalBody.innerHTML = `
+//     <img src="/images/${order.image_filename}" class="img-fluid mb-3" alt="Order Image">
+//       <h5>Customer Information</h5>
+//       <p><strong>Name:</strong> ${order.f_name} ${order.l_name}</p>
+//       <p><strong>Email:</strong> ${order.email}</p>
+//       <p><strong>Address:</strong> ${order.address}, ${order.postal_code}, ${order.country}</p>
+//       <p><strong>Phone:</strong> ${order.phone_number}</p>
+//       <hr>
+//       <h5>Order Items</h5>
+//       <table class="table">
+//         <thead>
+//           <tr>
+//             <th>Product</th>
+//             <th>Quantity</th>
+//             <th>Price</th>
+//           </tr>
+//         </thead>
+//         <tbody>
+//           ${itemsHtml}
+//         </tbody>
+//       </table>
+//       <p><strong>Total:</strong> $${parseFloat(order.total_amount).toFixed(2)}</p>
+//     `;
+
+//     $('#orderDetailsModal').modal('show');
+//   })
+//   .catch(error => {
+//     console.error('Error fetching order details:', error);
+//     showNotification('Failed to load order details.', true);
+//   });
+// }
+
+function showOrderDetailsModal(order) {
+  currentOrderId = order.id;
+
+  $('#orderDetailsContent').html(`
+    <p><strong>Order ID:</strong> ${order.id}</p>
+    <p><strong>Customer:</strong> ${order.customer}</p>
+    <p><strong>Total:</strong> ${order.total}</p>
+    <label for="modalStatusSelect">Change Status:</label>
+    <select id="modalStatusSelect" class="form-control mb-3">
+      <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+      <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+      <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+    </select>
+    <p><strong>Items:</strong><br>${order.items_detail}</p>
+  `);
+
+  $('#orderDetailsModal').modal('show');
 }
+
 
 // Show notification
 function showNotification(message, isError = false) {

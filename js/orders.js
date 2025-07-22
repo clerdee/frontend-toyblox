@@ -7,7 +7,7 @@ function initializeOrdersModule() {
   // Initialize DataTable
   ordersTable = $('#ordersTable').DataTable({
     responsive: true,
-    order: [[2, 'desc']], // Sort by date descending
+    order: [[2, 'desc']], 
 columns: [
   { data: 'id' },
   { 
@@ -49,9 +49,6 @@ columns: [
       return `
         <button class="btn btn-sm btn-info view-order" data-id="${data.id}" title="View Details">
           <i class="fas fa-eye"></i>
-        </button>
-        <button class="btn btn-sm btn-primary update-status" data-id="${data.id}" title="Update Status">
-          <i class="fas fa-truck"></i> Update Status
         </button>
       `;
     }
@@ -121,8 +118,8 @@ function viewOrderDetails(orderId) {
       
       const itemsHtml = order.items.map(item => `
         <tr>
-          <td>${item.name}</td>
-          <td><img src="${item.image_url}" alt="${item.name}" width="50"></td>
+          <td>${item.description}</td>
+          <td><img src="${item.image_path}" alt="${item.name}" width="50"></td>
           <td>${item.quantity}</td>
           <td>$${parseFloat(item.price_at_order).toFixed(2)}</td>
           <td>$${(item.quantity * item.price_at_order).toFixed(2)}</td>
@@ -203,11 +200,24 @@ function updateOrderStatus(orderId, status) {
       loadOrders();
     },
     error: function(xhr) {
-      console.error(`Failed to update order #${orderId} status:`, xhr.responseText);
-      alert('Failed to update order status. Please try again.');
+      // console.error(`Failed to update order #${orderId} status:`, xhr.responseText);
+      // alert('Failed to update order status. Please try again.');
     }
   });
 }
+
+$(document).on('click', '#updateStatusBtn', function () {
+  const newStatus = $('#modalStatusSelect').val();
+
+  if (!currentOrderId) {
+    alert("No order selected.");
+    return;
+  }
+
+  updateOrderStatus(currentOrderId, newStatus); // Calls your existing AJAX function
+  $('#orderDetailsModal').modal('hide');
+});
+
 
 function exportOrders() {
   const filteredData = ordersTable.rows({ search: 'applied' }).data().toArray();
